@@ -8,6 +8,7 @@ import {
 } from "react-native";
 import React, { useContext } from "react";
 import { Todo, TodoContext } from "@/app/index";
+import { createTaskAPI, updateTaskAPI } from "@/API/task";
 
 export default function TodoView() {
   const { state, dispatch } = useContext(TodoContext);
@@ -20,11 +21,8 @@ export default function TodoView() {
     dispatch({ type: "delete", payload: todo.id });
   };
 
-  const handleAddTodo = () => {
-    const newTodoItem = {
-      id: new Date().valueOf() / Math.random(),
-      text: todoText,
-    };
+  const handleAddTodo = async () => {
+    const newTodoItem = await createTaskAPI({ text: todoText });
     dispatch({ type: "add", payload: newTodoItem });
     setTodoText("");
     Keyboard.dismiss();
@@ -36,12 +34,14 @@ export default function TodoView() {
     setTodoText(todo.text);
     setTodoToUpdate(todo);
   };
-  const handleTodoUpdate = () => {
+  const handleTodoUpdate = async () => {
+    if (!todoToUpdate) return;
     const newTodoItem = {
-      id: todoToUpdate?.id,
+      id: todoToUpdate.id,
       text: todoText,
     };
-    dispatch({ type: "update", payload: newTodoItem });
+    const updatedTodo = await updateTaskAPI(newTodoItem);
+    dispatch({ type: "update", payload: updatedTodo });
     setTodoText("");
     Keyboard.dismiss();
     setEditMode(false);

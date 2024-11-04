@@ -1,6 +1,6 @@
-import React from 'react';
-import Profile from './page/profile';
-import TodoView from './page/todoView';
+import React, { useEffect } from "react";
+import TodoView from "./page/todoView";
+import { getTaskListAPI } from "@/API/task";
 export interface Todo {
   id: number;
   text: string;
@@ -16,16 +16,7 @@ interface TodoContextType {
 }
 
 const todosInitalState = {
-  todos: [
-    {
-      id: 1,
-      text: 'Learn Typescript',
-    },
-    {
-      id: 2,
-      text: 'Learn React Native',
-    },
-  ],
+  todos: [],
 };
 
 interface TodoAction {
@@ -35,16 +26,16 @@ interface TodoAction {
 
 function todoReducer(state: TodoState, action: TodoAction): TodoState {
   switch (action.type) {
-    case 'delete':
+    case "delete":
       const filteredTodos = state.todos.filter(
-        todo => todo.id !== action.payload,
+        (todo) => todo.id !== action.payload
       );
-      return {...state, todos: filteredTodos};
-    case 'add':
-      return {...state, todos: [action.payload, ...state.todos]};
-    case 'update':
+      return { ...state, todos: filteredTodos };
+    case "add":
+      return { ...state, todos: [action.payload, ...state.todos] };
+    case "update":
       const index = state.todos.findIndex(
-        todo => todo.id === action.payload.id,
+        (todo) => todo.id === action.payload.id
       );
 
       const newState = [
@@ -52,8 +43,9 @@ function todoReducer(state: TodoState, action: TodoAction): TodoState {
         action.payload,
         ...state.todos.slice(index + 1),
       ];
-      return {...state, todos: newState};
-
+      return { ...state, todos: newState };
+    case "get":
+      return { ...state, todos: action.payload };
     default:
       return todosInitalState;
   }
@@ -63,11 +55,20 @@ export const TodoContext = React.createContext<TodoContextType>({
   state: todosInitalState,
   dispatch: () => {},
 });
+
+const fetchAndDispatchTasks = async (dispatch: React.Dispatch<TodoAction>) => {
+  const todos = await getTaskListAPI();
+  dispatch({ type: "get", payload: todos });
+};
+
 export default function App() {
   const [state, dispatch] = React.useReducer(todoReducer, todosInitalState);
+  useEffect(() => {
+    fetchAndDispatchTasks(dispatch);
+  }, [dispatch]);
 
   return (
-    <TodoContext.Provider value={{state, dispatch}}>
+    <TodoContext.Provider value={{ state, dispatch }}>
       <TodoView />
     </TodoContext.Provider>
   );
