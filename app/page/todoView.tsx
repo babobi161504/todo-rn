@@ -92,6 +92,7 @@ export default function TodoView() {
     <View
       style={{
         paddingHorizontal: 20,
+        paddingVertical: 50,
       }}
     >
       <Text
@@ -112,6 +113,8 @@ export default function TodoView() {
           marginBottom: 30,
           backgroundColor: "#f7f8fa",
           alignItems: "center",
+          borderRadius: 10,
+          paddingHorizontal: 10,
         }}
       >
         <TextInput
