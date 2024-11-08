@@ -26,6 +26,7 @@ export default function TodoView() {
     dispatch({ type: "add", payload: newTodoItem });
     setTodoText("");
     Keyboard.dismiss();
+    //Tesst
   };
 
   const handleEditButton = (todo: Todo) => {
