@@ -1,6 +1,10 @@
 import React, { useEffect } from "react";
 import TodoView from "./page/todoView";
 import { getTaskListAPI } from "@/API/task";
+import { View, Text, Button } from "react-native";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import { NavigationContainer } from "@react-navigation/native";
+import { NativeStackNavigationProp } from "react-native-screens/lib/typescript/native-stack/types";
 export interface Todo {
   id: number;
   text: string;
@@ -61,6 +65,24 @@ const fetchAndDispatchTasks = async (dispatch: React.Dispatch<TodoAction>) => {
   dispatch({ type: "get", payload: todos });
 };
 
+export function HomeScreen({
+  navigation,
+}: {
+  navigation: NativeStackNavigationProp<any>;
+}) {
+  return (
+    <View>
+      <Text>Home Screen</Text>
+      <Button
+        title="Go to Todos"
+        onPress={() => navigation.navigate("Todos")}
+      />
+    </View>
+  );
+}
+
+const Stack = createNativeStackNavigator();
+
 export default function App() {
   const [state, dispatch] = React.useReducer(todoReducer, todosInitalState);
   useEffect(() => {
@@ -69,7 +91,12 @@ export default function App() {
 
   return (
     <TodoContext.Provider value={{ state, dispatch }}>
-      <TodoView />
+      <NavigationContainer independent={true}>
+        <Stack.Navigator>
+          <Stack.Screen name="Home" component={HomeScreen} />
+          <Stack.Screen name="Todos" component={TodoView} />
+        </Stack.Navigator>
+      </NavigationContainer>
     </TodoContext.Provider>
   );
 }
